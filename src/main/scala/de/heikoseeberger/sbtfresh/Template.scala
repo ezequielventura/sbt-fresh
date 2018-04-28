@@ -76,20 +76,6 @@ private object Template {
         |    )
         |
         |// *****************************************************************************
-        |// Library dependencies
-        |// *****************************************************************************
-        |
-        |lazy val library =
-        |  new {
-        |    object Version {
-        |      val scalaCheck = "1.14.0"
-        |      val utest      = "0.6.4"
-        |    }
-        |    val scalaCheck = "org.scalacheck" %% "scalacheck" % Version.scalaCheck
-        |    val utest      = "com.lihaoyi"    %% "utest"      % Version.utest
-        |  }
-        |
-        |// *****************************************************************************
         |// Settings
         |// *****************************************************************************
         |
@@ -123,6 +109,22 @@ private object Template {
         |  )
         |""".stripMargin
   }
+
+  def dependencies: String =
+    """|import sbt._
+       |// *****************************************************************************
+       |// Library dependencies
+       |// *****************************************************************************
+       |
+       |object library {
+       |  object Version {
+       |    val scalaCheck = "1.14.0"
+       |    val utest      = "0.6.4"
+       |  }
+       |  val scalaCheck = "org.scalacheck" %% "scalacheck" % Version.scalaCheck
+       |  val utest      = "com.lihaoyi"    %% "utest"      % Version.utest
+       |}
+       |""".stripMargin
 
   def gitignore: String =
     """|# sbt
@@ -199,7 +201,8 @@ private object Template {
       else
         ""
 
-    s"""|addSbtPlugin("com.dwijnand"      % "sbt-dynver"      % "3.0.0")${travisPlugin}
+    s"""|addSbtPlugin("io.get-coursier"   % "sbt-coursier"    % "1.0.1")
+        |addSbtPlugin("com.dwijnand"      % "sbt-dynver"      % "3.0.0")${travisPlugin}
         |addSbtPlugin("com.geirsson"      % "sbt-scalafmt"    % "1.5.0")
         |addSbtPlugin("de.heikoseeberger" % "sbt-header"      % "5.0.0")${wartRemoverPlugin}
         |
