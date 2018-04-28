@@ -14,7 +14,7 @@ Add sbt-fresh to your global plugins definition, which most probably resides
 under `~/.sbt/1.0/plugins/plugins.sbt`:
 
 ``` scala
-addSbtPlugin("de.heikoseeberger" % "sbt-fresh" % "4.2.2")
+addSbtPlugin("de.heikoseeberger" % "sbt-fresh" % "4.3.0")
 ```
 
 You can define the following settings in your global build definition, which
@@ -77,7 +77,8 @@ sbt-fresh creates a project with the following layout:
 + NOTICE
 + project
 --+ build.properties             // sbt version
---+ plugins.sbt                  // sbt-git, sbt-header, sbt-scalafmt
+--+ Dependencies.scala           // dependencies
+--+ plugins.sbt                  // sbt-git, sbt-header, sbt-scalafmt, sbt-coursier
 + README.md
 + src
 --+ main
