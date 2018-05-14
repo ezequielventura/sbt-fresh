@@ -32,6 +32,7 @@ private object Template {
                packageSegments: Vector[String],
                author: String,
                license: Option[License],
+               scalaJS: Boolean,
                setUpTravis: Boolean,
                setUpWartremover: Boolean): String = {
     val nameIdentifier = if (name.segments.mkString == name) name else s"`$name`"
@@ -52,6 +53,13 @@ private object Template {
       else
         ""
 
+    val scalaJSSettings =
+      if (scalaJS)
+        """|
+           |    .enablePlugins(ScalaJSPlugin)""".stripMargin
+      else
+        ""
+
     val scalaVersion =
       if (setUpTravis)
         """|// scalaVersion from .travis.yml via sbt-travisci
@@ -66,7 +74,7 @@ private object Template {
         |lazy val $nameIdentifier =
         |  project
         |    .in(file("."))
-        |    .enablePlugins(AutomateHeaderPlugin)
+        |    .enablePlugins(AutomateHeaderPlugin)$scalaJSSettings
         |    .settings(settings)
         |    .settings(
         |      libraryDependencies ++= Seq(
@@ -187,7 +195,7 @@ private object Template {
         |""".stripMargin
   }
 
-  def plugins(setUpTravis: Boolean, setUpWartremover: Boolean): String = {
+  def plugins(scalaJS: Boolean, setUpTravis: Boolean, setUpWartremover: Boolean): String = {
     val travisPlugin =
       if (setUpTravis)
         """|
@@ -200,11 +208,17 @@ private object Template {
            |addSbtPlugin("org.wartremover"   % "sbt-wartremover" % "2.2.1")""".stripMargin
       else
         ""
+    val scalaJSPlugin =
+      if (scalaJS)
+        """|
+           |addSbtPlugin("org.scala-js"      % "sbt-scalajs"     % "0.6.22")""".stripMargin
+      else
+        ""
 
     s"""|addSbtPlugin("io.get-coursier"   % "sbt-coursier"    % "1.0.1")
         |addSbtPlugin("com.dwijnand"      % "sbt-dynver"      % "3.0.0")${travisPlugin}
         |addSbtPlugin("com.geirsson"      % "sbt-scalafmt"    % "1.5.0")
-        |addSbtPlugin("de.heikoseeberger" % "sbt-header"      % "5.0.0")${wartRemoverPlugin}
+        |addSbtPlugin("de.heikoseeberger" % "sbt-header"      % "5.0.0")${scalaJSPlugin}${wartRemoverPlugin}
         |
         |libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.25" // Needed by sbt-git
         |""".stripMargin

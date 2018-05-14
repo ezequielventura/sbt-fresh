@@ -46,7 +46,7 @@ private final class Fresh(buildDir: Path,
   def writeBuildProperties(): Path =
     write("project/build.properties", Template.buildProperties)
 
-  def writeBuildSbt(setUpTravis: Boolean, setUpWartremover: Boolean): Path =
+  def writeBuildSbt(scalaJS: Boolean, setUpTravis: Boolean, setUpWartremover: Boolean): Path =
     write(
       "build.sbt",
       Template.buildSbt(organization,
@@ -54,6 +54,7 @@ private final class Fresh(buildDir: Path,
                         packageSegments,
                         author,
                         license,
+                        scalaJS,
                         setUpTravis,
                         setUpWartremover)
     )
@@ -75,8 +76,8 @@ private final class Fresh(buildDir: Path,
     write(path, Template.`package`(packageSegments, author))
   }
 
-  def writePlugins(setUpTravis: Boolean, setUpWartremover: Boolean): Path =
-    write("project/plugins.sbt", Template.plugins(setUpTravis, setUpWartremover))
+  def writePlugins(scalaJS: Boolean, setUpTravis: Boolean, setUpWartremover: Boolean): Path =
+    write("project/plugins.sbt", Template.plugins(scalaJS, setUpTravis, setUpWartremover))
 
   def writeReadme(): Path =
     write("README.md", Template.readme(name, license))

@@ -42,6 +42,9 @@ object FreshPlugin extends AutoPlugin {
     val freshSetUpGit: SettingKey[Boolean] =
       settingKey("Initialize a Git repo and create an initial commit – `true` by default")
 
+    val freshScalaJS: SettingKey[Boolean] =
+      settingKey("Include ScalaJS SBT plugin – `false` by default")
+
     val freshSetUpTravis: SettingKey[Boolean] =
       settingKey("Configure Travis for Continuous Integration - `true` by default")
 
@@ -57,6 +60,7 @@ object FreshPlugin extends AutoPlugin {
     final val Author           = "author"
     final val License          = "license"
     final val SetUpGit         = "setUpGit"
+    final val ScalaJS          = "scalaJS"
     final val SetUpTravis      = "setUpTravis"
     final val SetUpWartremover = "setUpWartremover"
   }
@@ -66,6 +70,7 @@ object FreshPlugin extends AutoPlugin {
                                 author: Option[String],
                                 license: Option[License],
                                 setUpGit: Option[Boolean],
+                                scalaJS: Option[Boolean],
                                 setUpTravis: Option[Boolean],
                                 setUpWartremover: Option[Boolean])
 
@@ -88,6 +93,7 @@ object FreshPlugin extends AutoPlugin {
       freshAuthor := sys.props.getOrElse("user.name", DefaultAuthor),
       freshLicense := DefaultLicense,
       freshSetUpGit := true,
+      freshScalaJS := false,
       freshSetUpTravis := true,
       freshSetUpWartremover := false
     )
@@ -107,9 +113,10 @@ object FreshPlugin extends AutoPlugin {
     arg(Arg.Author, token(StringBasic)).? ~ // Without token tab completion becomes non-computable!
     arg(Arg.License, licenseParser).? ~
     arg(Arg.SetUpGit, Bool).? ~
+    arg(Arg.ScalaJS, Bool).? ~
     arg(Arg.SetUpTravis, Bool).? ~
     arg(Arg.SetUpWartremover, Bool).?
-    args.map { case o ~ n ~ a ~ l ~ g ~ t ~ wr => Args(o, n, a, l, g, t, wr) }
+    args.map { case o ~ n ~ a ~ l ~ g ~ js ~ t ~ wr => Args(o, n, a, l, g, js, t, wr) }
   }
 
   private def effect(state: State, args: Args) = {
@@ -123,18 +130,19 @@ object FreshPlugin extends AutoPlugin {
     val author           = args.author.getOrElse(setting(freshAuthor))
     val license          = args.license.orElse(setting(freshLicense))
     val setUpGit         = args.setUpGit.getOrElse(setting(freshSetUpGit))
+    val scalaJS          = args.scalaJS.getOrElse(setting(freshScalaJS))
     val setUpTravis      = args.setUpTravis.getOrElse(setting(freshSetUpTravis))
     val setUpWartremover = args.setUpWartremover.getOrElse(setting(freshSetUpWartremover))
 
     val fresh = new Fresh(buildDir, organization, name, author, license)
     fresh.writeBuildProperties()
-    fresh.writeBuildSbt(setUpTravis, setUpWartremover)
+    fresh.writeBuildSbt(scalaJS, setUpTravis, setUpWartremover)
     fresh.writeDependencies()
     fresh.writeGitignore()
     fresh.writeLicense()
     fresh.writeNotice()
     fresh.writePackage()
-    fresh.writePlugins(setUpTravis, setUpWartremover)
+    fresh.writePlugins(scalaJS, setUpTravis, setUpWartremover)
     fresh.writeReadme()
     fresh.writeScalafmt()
     if (setUpTravis) fresh.writeTravisYml()
