@@ -14,7 +14,7 @@ Add sbt-fresh to your global plugins definition, which most probably resides
 under `~/.sbt/1.0/plugins/plugins.sbt`:
 
 ``` scala
-addSbtPlugin("de.heikoseeberger" % "sbt-fresh" % "4.3.0")
+addSbtPlugin("de.heikoseeberger" % "sbt-fresh" % "4.3.1")
 ```
 
 You can define the following settings in your global build definition, which
@@ -27,6 +27,7 @@ freshOrganization     := "doe.john"        // Organization – "default" by defa
 freshAuthor           := "John Doe"        // Author – value of "user.name" system property or "default" by default
 freshLicense          := Some(License.mit) // Optional license – `apache20` by default
 freshSetUpGit         := true              // Initialize a Git repo and create an initial commit – `true` by default
+freshScalaJS          := true              // Include ScalaJS SBT plugin – `false` by default
 freshSetUpTravis      := true              // Configure Travis for Continuous Integration - `true` by default
 freshSetUpWartremover := true              // Include the sbt wartremover (http://www.wartremover.org) plugin - `false` by default
 ```
@@ -47,6 +48,7 @@ arguments (hit tab for auto completion) which override the respective settings:
 - `author`
 - `license`
 - `setUpGit`
+- `scalaJS`
 - `setUpTravis`
 - `setUpWartremover`
 
