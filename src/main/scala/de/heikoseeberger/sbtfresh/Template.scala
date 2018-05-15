@@ -60,6 +60,13 @@ private object Template {
       else
         ""
 
+    val scalaJSDependencies =
+      if (scalaJS)
+        """|
+           |library.scalaJSDependencies.value ++""".stripMargin
+      else
+        ""
+
     val scalaVersion =
       if (setUpTravis)
         """|// scalaVersion from .travis.yml via sbt-travisci
@@ -77,10 +84,9 @@ private object Template {
         |    .enablePlugins(AutomateHeaderPlugin)$scalaJSSettings
         |    .settings(settings)
         |    .settings(
-        |      libraryDependencies ++= Seq(
-        |        library.scalaCheck % Test,
-        |        library.utest      % Test
-        |      )
+        |      libraryDependencies ++= 
+        |        library.commonDependencies ++${scalaJSDependencies}  
+        |        library.testDependencies 
         |    )
         |
         |// *****************************************************************************
@@ -118,8 +124,26 @@ private object Template {
         |""".stripMargin
   }
 
-  def dependencies: String =
-    """|import sbt._
+  def scalaJSImports(scalaJS: Boolean): String =
+    if (scalaJS)
+      """|import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
+         |""".stripMargin
+    else
+      ""
+
+  def scalaJSDomDependencies(scalaJS: Boolean): String =
+    if (scalaJS)
+      """|
+         |lazy val scalaJSDependencies = Def.setting(Seq(
+         |  "org.scala-js" %%% "scalajs-dom" % "0.9.5"
+         |))""".stripMargin
+    else
+      ""
+
+  def dependencies(scalaJS: Boolean): String = {
+    val scalaJSImportsStr         = scalaJSImports(scalaJS)
+    val scalaJSDomDependenciesStr = scalaJSDomDependencies(scalaJS)
+    s"""${scalaJSImportsStr}|import sbt._
        |// *****************************************************************************
        |// Library dependencies
        |// *****************************************************************************
@@ -129,11 +153,16 @@ private object Template {
        |    val scalaCheck = "1.14.0"
        |    val utest      = "0.6.4"
        |  }
-       |  val scalaCheck = "org.scalacheck" %% "scalacheck" % Version.scalaCheck
-       |  val utest      = "com.lihaoyi"    %% "utest"      % Version.utest
+       |
+       |  lazy val commonDependencies = Seq()${scalaJSDomDependenciesStr}
+       |
+       |  lazy val testDependencies = Seq(
+       |    "org.scalacheck" %% "scalacheck" % Version.scalaCheck,
+       |    "com.lihaoyi"    %% "utest"      % Version.utest
+       |  ).map(_  % Test)
        |}
        |""".stripMargin
-
+  }
   def gitignore: String =
     """|# sbt
        |lib_managed

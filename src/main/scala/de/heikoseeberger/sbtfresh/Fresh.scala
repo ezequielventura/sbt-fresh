@@ -59,8 +59,8 @@ private final class Fresh(buildDir: Path,
                         setUpWartremover)
     )
 
-  def writeDependencies(): Path =
-    write("project/Dependencies.scala", Template.dependencies)
+  def writeDependencies(scalaJS: Boolean): Path =
+    write("project/Dependencies.scala", Template.dependencies(scalaJS))
 
   def writeGitignore(): Path =
     write(".gitignore", Template.gitignore)
